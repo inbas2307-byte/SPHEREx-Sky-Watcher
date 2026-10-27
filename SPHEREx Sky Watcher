@@ -1,0 +1,1906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<title>SPHEREx Sky Watcher · NASA × SpaceX Challenge 2026</title>
+<style>
+  :root {
+    --bg: #02040a;
+    --panel: #0a1020;
+    --panel-2: #0e1630;
+    --border: #1a2542;
+    --border-2: #2a3a63;
+    --text: #eef3ff;
+    --sub: #8ea0c8;
+    --dim: #5a6b8c;
+    --accent: #5b9dff;
+    --accent-2: #7fb3ff;
+    --pink: #ff5e8a;
+    --amber: #ffb347;
+    --red: #ff7864;
+    --gold: #ffd47a;
+    --violet: #b57bff;
+    --green: #37e0a0;
+    --mono: ui-monospace, 'SF Mono', Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: radial-gradient(ellipse 90% 60% at 50% -10%, #0c1630 0%, transparent 55%), var(--bg);
+    color: var(--text);
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+    line-height: 1.55;
+    min-height: 100vh;
+    padding: 16px;
+    overflow-x: hidden;
+  }
+  .wrap { max-width: 1500px; margin: 0 auto; }
+
+  /* ---------- Cinematic intro ---------- */
+  .intro {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: radial-gradient(circle at center, #0a1428 0%, #02040a 70%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transition: opacity 1s ease;
+  }
+  .intro.fade { opacity: 0; pointer-events: none; }
+  .intro-logo {
+    width: 80px; height: 80px;
+    border-radius: 20px;
+    background: radial-gradient(circle at 30% 25%, #7fb3ff, #1e3a7a 60%, #0a1428);
+    box-shadow: 0 0 50px rgba(91,157,255,0.5);
+    display: grid;
+    place-items: center;
+    font-size: 2.5rem;
+    animation: introPulse 2s ease-in-out infinite;
+  }
+  @keyframes introPulse { 50% { transform: scale(1.08); box-shadow: 0 0 70px rgba(91,157,255,0.8); } }
+  .intro-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #7fb3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.01em;
+  }
+  .intro-sub {
+    color: var(--sub);
+    font-size: 0.9rem;
+    font-family: var(--mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .intro-progress {
+    width: 220px;
+    height: 3px;
+    background: rgba(91,157,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .intro-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    animation: introLoad 2.4s ease-out forwards;
+  }
+  @keyframes introLoad {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  h1 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, #7fb3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .sub { color: var(--sub); font-size: 0.78rem; margin-top: 2px; }
+  .badges { display: flex; gap: 6px; flex-wrap: wrap; }
+  .badge {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    color: var(--sub);
+    padding: 4px 11px;
+    border-radius: 40px;
+    font-size: 0.7rem;
+  }
+  .badge strong { color: var(--accent); }
+  .badge.spacex { border-color: rgba(255,255,255,0.2); }
+
+  /* ---------- Controls ---------- */
+  .controls {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 12px 16px;
+    margin-bottom: 12px;
+  }
+  .ctrl-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .ctrl-row + .ctrl-row { margin-top: 10px; }
+  .ctrl-label {
+    font-size: 0.66rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .btn {
+    background: #141c34;
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    padding: 7px 13px;
+    border-radius: 9px;
+    font-size: 0.8rem;
+    font-family: inherit;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .btn:hover { background: #1e2a4a; border-color: var(--accent); }
+  .btn.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 12px rgba(91,157,255,0.4);
+  }
+  .btn.primary {
+    background: linear-gradient(135deg, var(--accent), var(--violet));
+    border: none;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(91,157,255,0.4);
+  }
+  .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(91,157,255,0.6); }
+
+  /* Speed control */
+  .speed-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px 10px 4px 12px;
+  }
+  .speed-presets {
+    display: flex;
+    gap: 3px;
+    background: rgba(0,0,0,0.35);
+    border-radius: 8px;
+    padding: 3px;
+  }
+  .speed-preset {
+    background: transparent;
+    border: none;
+    color: var(--sub);
+    padding: 4px 9px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    min-width: 40px;
+    text-align: center;
+  }
+  .speed-preset:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+  .speed-preset.on {
+    background: var(--accent);
+    color: #fff;
+    box-shadow: 0 0 8px rgba(91,157,255,0.4);
+  }
+  .speed-fine {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-left: 6px;
+    border-left: 1px solid var(--border);
+  }
+  .speed-fine input[type=range] {
+    width: 100px;
+    height: 4px;
+    min-width: 100px;
+    flex: none;
+  }
+  .speed-value {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,0,0,0.4);
+    padding: 3px 8px;
+    border-radius: 6px;
+    min-width: 52px;
+    text-align: center;
+  }
+
+  .timeline-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 280px;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    flex: 1;
+    min-width: 140px;
+    height: 5px;
+    background: #0a1226;
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 12px rgba(91,157,255,0.5);
+    cursor: grab;
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 3px solid var(--accent);
+    box-shadow: 0 0 12px rgba(91,157,255,0.5);
+    cursor: grab;
+  }
+  .readout {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,0,0,0.5);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    min-width: 90px;
+    text-align: center;
+  }
+
+  /* Band selector */
+  .band-selector {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .band-chip {
+    background: #141c34;
+    border: 1px solid var(--border-2);
+    color: var(--sub);
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 0.68rem;
+    font-family: var(--mono);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .band-chip:hover { border-color: var(--accent); color: var(--text); }
+  .band-chip.on {
+    color: #fff;
+    border-color: currentColor;
+    box-shadow: 0 0 10px currentColor;
+  }
+  .band-chip .wl {
+    display: block;
+    font-size: 0.55rem;
+    font-weight: 400;
+    opacity: 0.7;
+    margin-top: 1px;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 950px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(180deg, #0a1224, #060c1a);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.9);
+  }
+  .card.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent), 0 20px 40px -20px rgba(0,0,0,0.9);
+  }
+  .card-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 14px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), transparent);
+    border-bottom: 1px solid var(--border);
+  }
+  .card-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .pip {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .pip.pip-1 { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .epoch-tag {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    font-weight: 600;
+    color: var(--sub);
+    background: rgba(0,0,0,0.35);
+    padding: 3px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+  .canvas-wrap {
+    position: relative;
+    background: #000;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+  }
+  .canvas-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 48%, rgba(0,0,0,0.7) 100%);
+    z-index: 3;
+  }
+  canvas { display: block; width: 100%; height: 100%; }
+
+  .overlay {
+    position: absolute;
+    z-index: 5;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: #fff;
+    letter-spacing: 0.04em;
+  }
+  .motion-badge {
+    top: 10px; right: 10px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    background: linear-gradient(90deg, var(--pink), #ff8fb1);
+    box-shadow: 0 0 14px rgba(255,94,138,0.55);
+    animation: motionPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes motionPulse { 50% { opacity: 0.6; transform: scale(0.97); } }
+  .band-badge {
+    bottom: 10px; left: 10px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid currentColor;
+    backdrop-filter: blur(6px);
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    transition: all 0.3s;
+  }
+  .speed-badge {
+    bottom: 10px; right: 10px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid var(--accent);
+    backdrop-filter: blur(6px);
+    font-weight: 700;
+    color: var(--accent-2);
+    letter-spacing: 0.08em;
+    transition: all 0.2s;
+  }
+  .blink-indicator {
+    top: 10px; left: 10px;
+    padding: 5px 10px;
+    border-radius: 7px;
+    background: rgba(0,0,0,0.75);
+    border: 1px solid rgba(255,255,255,0.2);
+    backdrop-filter: blur(6px);
+    font-weight: 700;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .blink-indicator.on { opacity: 1; }
+
+  /* Bottom panels */
+  .bottom {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 14px;
+  }
+  @media (max-width: 1100px) { .bottom { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 700px) { .bottom { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 14px 18px;
+  }
+  .panel h3 {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .panel h3 .sub-h {
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--sub);
+    font-size: 0.68rem;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .stat {
+    background: rgba(0,0,0,0.28);
+    border-radius: 9px;
+    padding: 8px 11px;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 2px;
+  }
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.pink { color: var(--pink); }
+  .stat-value.gold { color: var(--gold); }
+
+  .legend {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 0.7rem;
+    color: var(--sub);
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.04);
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .sw {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+  }
+  .sw-star { background: #fff; box-shadow: 0 0 5px #fff; }
+  .sw-comet { background: #7fb3ff; box-shadow: 0 0 6px #7fb3ff; }
+  .sw-asteroid { background: var(--amber); box-shadow: 0 0 5px var(--amber); }
+  .sw-fast { background: var(--red); box-shadow: 0 0 5px var(--red); }
+  .sw-nebula { background: var(--gold); box-shadow: 0 0 8px var(--gold); }
+
+  .star-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+  .star-list::-webkit-scrollbar { width: 4px; }
+  .star-list::-webkit-scrollbar-track { background: transparent; }
+  .star-list::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
+  .star-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 9px;
+    border-radius: 7px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .star-row:hover { background: rgba(91,157,255,0.08); }
+  .star-row.selected {
+    background: rgba(91,157,255,0.14);
+    border-color: rgba(91,157,255,0.4);
+  }
+  .star-row .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .star-row .nm { flex: 1; color: var(--text); font-weight: 500; }
+  .star-row .bayer {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--dim);
+  }
+  .star-row .cls {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: var(--sub);
+    background: rgba(0,0,0,0.3);
+    padding: 1px 6px;
+    border-radius: 4px;
+  }
+  .star-row .mag {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    color: var(--dim);
+  }
+  .star-row .dist {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    color: var(--dim);
+  }
+
+  .info-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .info-hint {
+    color: var(--dim);
+    font-style: italic;
+    font-size: 0.82rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .info-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .info-id {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,0,0,0.4);
+    padding: 3px 9px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    letter-spacing: 0.06em;
+  }
+  .info-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .info-bayer {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--dim);
+  }
+  .info-fields {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--sub);
+    margin-top: 4px;
+  }
+  .info-fields span strong { color: var(--text); font-weight: 600; }
+  .info-desc {
+    font-size: 0.8rem;
+    color: var(--sub);
+    line-height: 1.55;
+    border-left: 2px solid var(--accent);
+    padding-left: 10px;
+    margin-top: 6px;
+  }
+  .info-desc strong { color: var(--text); }
+  .spectrum-bar {
+    display: flex;
+    height: 26px;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-top: 6px;
+  }
+  .spectrum-bar .band {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    font-family: var(--mono);
+    font-size: 0.55rem;
+    color: rgba(255,255,255,0.75);
+    font-weight: 600;
+    position: relative;
+  }
+  .spectrum-bar .band.on {
+    color: #fff;
+    box-shadow: inset 0 0 0 2px #fff;
+  }
+
+  /* Presentation mode */
+  body.presenting header,
+  body.presenting .controls,
+  body.presenting .bottom,
+  body.presenting footer {
+    display: none;
+  }
+  body.presenting .grid {
+    grid-template-columns: 1fr;
+    max-width: 100vh;
+    margin: 0 auto;
+  }
+  body.presenting .card:first-child {
+    display: none;
+  }
+  body.presenting .card.active {
+    border-color: var(--border);
+    box-shadow: 0 20px 40px -20px rgba(0,0,0,0.9);
+  }
+  .presentation-exit {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(0,0,0,0.8);
+    border: 1px solid var(--border-2);
+    color: var(--text);
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    display: none;
+  }
+  body.presenting .presentation-exit { display: block; }
+
+  footer {
+    margin-top: 20px;
+    text-align: center;
+    font-size: 0.72rem;
+    color: var(--dim);
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    line-height: 1.6;
+  }
+  footer kbd {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--sub);
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 12px; }
+    .controls { padding: 10px; }
+    .btn { padding: 6px 10px; font-size: 0.75rem; }
+    h1 { font-size: 1.15rem; }
+    .speed-preset { min-width: 34px; padding: 3px 6px; font-size: 0.66rem; }
+    .speed-fine input[type=range] { width: 70px; min-width: 70px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Cinematic intro -->
+<div class="intro" id="intro">
+  <div class="intro-logo">🔭</div>
+  <div class="intro-title">SPHEREx Sky Watcher</div>
+  <div class="intro-sub">NASA × SpaceX Challenge 2026</div>
+  <div class="intro-progress"><div class="intro-progress-bar"></div></div>
+</div>
+
+<button class="presentation-exit" id="presentationExit">✕ Exit presentation</button>
+
+<div class="wrap">
+
+  <header>
+    <div>
+      <h1>SPHEREx Sky Watcher</h1>
+      <div class="sub">Real Orion field · 102-band explorer · NASA × SpaceX Challenge 2026</div>
+    </div>
+    <div class="badges">
+      <span class="badge"><strong>102</strong> bands</span>
+      <span class="badge">30° field · M42</span>
+      <span class="badge spacex">🛰️ Challenge 2026</span>
+    </div>
+  </header>
+
+  <div class="controls">
+    <div class="ctrl-row">
+      <span class="ctrl-label">Timeline</span>
+      <div class="timeline-group">
+        <input type="range" id="slider" min="0" max="100" value="0" step="1">
+        <span class="readout" id="readout">JAN 2025</span>
+      </div>
+      <button class="btn" id="playBtn">▶ Play</button>
+      <button class="btn" id="blinkBtn">⚡ Blink</button>
+      <button class="btn primary" id="presentBtn">📽️ Presentation</button>
+      <button class="btn" id="snapBtn">📸 Snapshot</button>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Speed</span>
+      <div class="speed-group">
+        <div class="speed-presets" id="speedPresets">
+          <button class="speed-preset" data-speed="0.25">0.25×</button>
+          <button class="speed-preset" data-speed="0.5">0.5×</button>
+          <button class="speed-preset on" data-speed="1">1×</button>
+          <button class="speed-preset" data-speed="2">2×</button>
+          <button class="speed-preset" data-speed="4">4×</button>
+        </div>
+        <div class="speed-fine">
+          <input type="range" id="speedRange" min="10" max="800" value="100" step="5">
+          <span class="speed-value" id="speedValue">1.00×</span>
+        </div>
+      </div>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Overlays</span>
+      <button class="btn on" id="labelBtn">🏷 Labels</button>
+      <button class="btn on" id="trailBtn">〰 Trails</button>
+      <button class="btn on" id="ghostBtn">◌ Ghosts</button>
+      <button class="btn on" id="vectorBtn">→ Vectors</button>
+      <button class="btn on" id="constBtn">✧ Constellations</button>
+      <button class="btn on" id="nebulaBtn">✦ Nebula</button>
+    </div>
+    <div class="ctrl-row">
+      <span class="ctrl-label">Infrared band</span>
+      <div class="band-selector" id="bandSelector"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card" id="cardA">
+      <div class="card-head">
+        <div class="card-title"><span class="pip pip-1"></span>Epoch 1 · Jan 2025</div>
+        <span class="epoch-tag">REFERENCE</span>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="cvA" width="700" height="700"></canvas>
+        <div class="overlay band-badge" id="bandBadgeA">D1 · 0.75 µm</div>
+        <div class="overlay speed-badge" id="speedBadgeA">1.00×</div>
+      </div>
+    </div>
+
+    <div class="card active" id="cardB">
+      <div class="card-head">
+        <div class="card-title"><span class="pip"></span>Epoch 2 · Jul 2025</div>
+        <span class="epoch-tag" id="tTag">t = 0.00</span>
+      </div>
+      <div class="canvas-wrap">
+        <div class="overlay blink-indicator" id="blinkIndicator">EPOCH 2</div>
+        <div class="overlay motion-badge">● MOTION</div>
+        <div class="overlay band-badge" id="bandBadgeB">D1 · 0.75 µm</div>
+        <div class="overlay speed-badge" id="speedBadgeB">1.00×</div>
+        <canvas id="cvB" width="700" height="700"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom">
+    <div class="panel">
+      <h3>Object inspector <span class="sub-h" id="insSubtitle">—</span></h3>
+      <div class="info-panel" id="infoPanel">
+        <div class="info-hint">🔍 Click any object or catalog entry to inspect it</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Orion catalog <span class="sub-h">Click to select</span></h3>
+      <div class="star-list" id="starList"></div>
+    </div>
+
+    <div class="panel">
+      <h3>Field statistics</h3>
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-label">Total sources</div>
+          <div class="stat-value" id="statTotal">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Moving</div>
+          <div class="stat-value pink" id="statMoving">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Named stars</div>
+          <div class="stat-value accent" id="statNamed">9</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Deep-sky</div>
+          <div class="stat-value gold" id="statDSO">4</div>
+        </div>
+      </div>
+      <div class="legend">
+        <span class="legend-item"><span class="sw sw-star"></span>star</span>
+        <span class="legend-item"><span class="sw sw-comet"></span>comet</span>
+        <span class="legend-item"><span class="sw sw-asteroid"></span>asteroid</span>
+        <span class="legend-item"><span class="sw sw-fast"></span>NEO</span>
+        <span class="legend-item"><span class="sw sw-nebula"></span>nebula</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Real Orion catalog data · Bayer designations from standard references · positions approximate within 30° field centered on M42<br>
+    <kbd>Space</kbd> play · <kbd>B</kbd> blink · <kbd>←</kbd><kbd>→</kbd> scrub · <kbd>1</kbd>–<kbd>6</kbd> band · <kbd>[</kbd> <kbd>]</kbd> speed · <kbd>P</kbd> present · <kbd>S</kbd> snapshot<br>
+    Real SPHEREx data: <span style="color:var(--accent);">spherex.caltech.edu</span> · archive: <span style="color:var(--accent);">irsa.ipac.caltech.edu</span>
+  </footer>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  const W = 700, H = 700;
+
+  /* -------- PRNG -------- */
+  let seed = 0xCAFE;
+  function rand() {
+    seed = (seed * 16807) % 2147483647;
+    return (seed - 1) / 2147483646;
+  }
+  function gaussian() {
+    const u1 = Math.max(rand(), 1e-6), u2 = rand();
+    return Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+  }
+  function rr(a, b) { return a + rand() * (b - a); }
+
+  /* -------- Spectral classes -------- */
+  const SPECTRAL = {
+    O: { color: '#a8c8ff', temp: '30,000+ K' },
+    B: { color: '#b8d4ff', temp: '10,000–30,000 K' },
+    A: { color: '#e8f0ff', temp: '7,500–10,000 K' },
+    F: { color: '#fff5e8', temp: '6,000–7,500 K' },
+    G: { color: '#ffe9b0', temp: '5,200–6,000 K' },
+    K: { color: '#ffc888', temp: '3,700–5,200 K' },
+    M: { color: '#ff9a78', temp: 'Under 3,700 K' },
+  };
+
+  /* -------- 12 SPHEREx wavelength slices -------- */
+  const BANDS = [
+    { id: 1, wl: 0.75, name: 'D1a', color: '#9ab8ff', desc: 'Visible-red edge. Hot O/B stars dominate.', filter: (o) => o.type === 'star' && (o.spectral === 'O' || o.spectral === 'B' || o.spectral === 'A') },
+    { id: 2, wl: 0.95, name: 'D1b', color: '#9db0ff', desc: 'Blue-violet to near-IR boundary.', filter: (o) => o.type === 'star' && o.spectral !== 'M' },
+    { id: 3, wl: 1.10, name: 'D2a', color: '#8ea0ff', desc: 'Near-infrared. F/G/K stars peak here.', filter: (o) => o.type === 'star' && (o.spectral === 'F' || o.spectral === 'G' || o.spectral === 'K') },
+    { id: 4, wl: 1.40, name: 'D2b', color: '#a090ff', desc: 'Water vapor absorption begins.', filter: (o) => o.type === 'star' || o.type === 'nebula' },
+    { id: 5, wl: 1.60, name: 'D3a', color: '#b98aff', desc: 'Deep NIR. Red giants dominate.', filter: (o) => (o.type === 'star' && o.spectral === 'M') || o.type === 'nebula' },
+    { id: 6, wl: 1.90, name: 'D3b', color: '#c68aff', desc: 'Dust-penetrating. Reveals embedded stars.', filter: (o) => o.type === 'nebula' || o.type === 'comet' },
+    { id: 7, wl: 2.20, name: 'D4a', color: '#d47aff', desc: 'PAH emission peaks here.', filter: (o) => o.type === 'nebula' || o.type === 'comet' },
+    { id: 8, wl: 2.60, name: 'D4b', color: '#e07aff', desc: 'PAH + water ice features.', filter: (o) => o.type === 'nebula' || o.type === 'comet' },
+    { id: 9, wl: 3.10, name: 'D5a', color: '#ff7bd4', desc: 'Water ice absorption.', filter: (o) => o.type === 'nebula' || o.type === 'comet' },
+    { id: 10, wl: 3.50, name: 'D5b', color: '#ff8fc8', desc: 'CO₂ ice + PAH.', filter: (o) => o.type === 'nebula' || o.type === 'comet' },
+    { id: 11, wl: 4.20, name: 'D6a', color: '#ff8fb1', desc: 'Cold dust emission.', filter: (o) => o.type === 'nebula' || o.type === 'fast' || o.type === 'asteroid' || o.type === 'comet' },
+    { id: 12, wl: 4.60, name: 'D6b', color: '#ff9a9a', desc: 'Deepest band. Cold dust + distant galaxies.', filter: (o) => o.type !== 'star' || o.type === 'star' },
+  ];
+
+  let currentBand = 0;
+
+  /* -------- Deep-sky objects -------- */
+  const nebulae = [
+    { id: 'M42', name: 'Orion Nebula', x: 350, y: 380, size: 120, hue: 210, intensity: 0.07 },
+    { id: 'M43', name: "De Mairan's Nebula", x: 330, y: 400, size: 45, hue: 200, intensity: 0.05 },
+    { id: 'NGC1977', name: 'Running Man Nebula', x: 400, y: 280, size: 60, hue: 220, intensity: 0.045 },
+    { id: 'Barnard', name: "Barnard's Loop", x: 240, y: 500, size: 130, hue: 190, intensity: 0.035 },
+    { id: 'NGC1980', name: 'Lower Sword', x: 320, y: 420, size: 50, hue: 215, intensity: 0.03 },
+    { id: 'NGC2024', name: 'Flame Nebula', x: 305, y: 490, size: 55, hue: 20, intensity: 0.04 },
+    { id: 'B33', name: 'Horsehead Nebula', x: 290, y: 505, size: 35, hue: 0, intensity: 0.06 },
+    { id: 'NGC2169', name: '37 Cluster', x: 410, y: 350, size: 40, hue: 220, intensity: 0.03 },
+    { id: 'NGC2194', name: 'Collinder 72', x: 430, y: 320, size: 45, hue: 210, intensity: 0.025 },
+    { id: 'LDN1640', name: 'L1630 Dark Cloud', x: 310, y: 480, size: 70, hue: 250, intensity: 0.02 },
+    { id: 'NGC1999', name: 'Reflection Nebula', x: 380, y: 410, size: 30, hue: 195, intensity: 0.035 },
+    { id: 'M78', name: 'M78 Reflection Nebula', x: 250, y: 220, size: 40, hue: 225, intensity: 0.03 },
+  ];
+
+  const clusters = [
+    { x: 350, y: 380, sigma: 55 },
+    { x: 280, y: 240, sigma: 60 },
+    { x: 480, y: 500, sigma: 70 },
+    { x: 350, y: 500, sigma: 40 },
+  ];
+
+  /* -------- Objects -------- */
+  const objects = [];
+
+  for (const n of nebulae) {
+    objects.push({
+      id: n.id, name: n.name, type: 'nebula',
+      x: n.x, y: n.y, vx: 0, vy: 0,
+      size: n.size * 0.4, mag: 4.0, spectral: null, isDSO: true,
+      dist: n.id === 'M42' ? '1,344 ly' : '~1,300 ly',
+      desc: `<strong>${n.name}.</strong> Part of the Orion molecular cloud complex, one of the nearest and most studied star-forming regions.`
+    });
+  }
+
+  for (let i = 0; i < 240; i++) {
+    let x, y;
+    if (rand() < 0.65) {
+      const c = clusters[Math.floor(rand() * clusters.length)];
+      x = c.x + gaussian() * c.sigma * 0.5;
+      y = c.y + gaussian() * c.sigma * 0.5;
+    } else {
+      x = rr(20, W - 20);
+      y = rr(20, H - 20);
+    }
+    x = Math.max(15, Math.min(W - 15, x));
+    y = Math.max(15, Math.min(H - 15, y));
+    const mag = rr(7, 17);
+    const cls = ['O','B','A','F','G','K','M'][Math.floor(Math.pow(rand(), 1.5) * 7)];
+    objects.push({
+      id: 'S' + String(i).padStart(3, '0'),
+      name: null, type: 'star',
+      x, y, vx: 0, vy: 0,
+      size: 0.7 + Math.max(0, (16 - mag)) * 0.16,
+      mag, spectral: cls,
+      dist: '—',
+      desc: `<strong>Field star.</strong> Simulated ${cls}-type star in the Orion field.`
+    });
+  }
+
+  /* -------- Real Orion bright stars -------- */
+  const brightStars = [
+    { name: 'Betelgeuse', bayer: 'α Orionis', x: 260, y: 180, mag: 0.5, cls: 'M', dist: '~640 ly',
+      desc: '<strong>Red supergiant.</strong> Semiregular variable. If placed at the Sun\'s position, its surface would extend past Mars. Will go supernova within ~100,000 years.' },
+    { name: 'Rigel', bayer: 'β Orionis', x: 480, y: 540, mag: 0.13, cls: 'B', dist: '~860 ly',
+      desc: '<strong>Blue supergiant.</strong> Brightest star in Orion and 6th brightest in the night sky. Triple star system. Name from Arabic <em>rijl</em>, "foot".' },
+    { name: 'Bellatrix', bayer: 'γ Orionis', x: 450, y: 170, mag: 1.64, cls: 'B', dist: '~250 ly',
+      desc: '<strong>Blue-white giant.</strong> The "Amazon Star". 27th brightest in the night sky. Faintly variable.' },
+    { name: 'Mintaka', bayer: 'δ Orionis', x: 380, y: 400, mag: 2.25, cls: 'O', dist: '~1,200 ly',
+      desc: '<strong>Multiple star system.</strong> Western star of Orion\'s Belt. Name means "the belt" in Arabic.' },
+    { name: 'Alnilam', bayer: 'ε Orionis', x: 350, y: 430, mag: 1.69, cls: 'O', dist: '~2,000 ly',
+      desc: '<strong>Blue supergiant.</strong> Middle and brightest star of Orion\'s Belt. Name means "string of pearls". One of the most luminous stars known.' },
+    { name: 'Alnitak', bayer: 'ζ Orionis', x: 320, y: 460, mag: 1.74, cls: 'O', dist: '~1,260 ly',
+      desc: '<strong>Hot blue supergiant.</strong> Eastern star of Orion\'s Belt. Triple system. Name means "the girdle". The Flame and Horsehead Nebulae lie nearby.' },
+    { name: 'Saiph', bayer: 'κ Orionis', x: 250, y: 550, mag: 2.07, cls: 'B', dist: '~650 ly',
+      desc: '<strong>Blue supergiant.</strong> Orion\'s left foot. Name means "sword of the giant". Much of its light is emitted in ultraviolet.' },
+    { name: 'Meissa', bayer: 'λ Orionis', x: 350, y: 120, mag: 3.33, cls: 'O', dist: '~1,100 ly',
+      desc: '<strong>Multiple star marking Orion\'s head.</strong> Name means "the shining one". Part of young cluster Collinder 69.' },
+    { name: 'Trapezium C', bayer: 'θ¹ Ori C', x: 348, y: 378, mag: 5.13, cls: 'O', dist: '~1,344 ly',
+      desc: '<strong>Brightest star of the Trapezium Cluster</strong> at the heart of the Orion Nebula. ~40 solar masses. Its UV radiation makes the whole nebula glow.' },
+  ];
+
+  for (const b of brightStars) {
+    objects.push({
+      id: b.name, name: b.name, bayer: b.bayer, type: 'star',
+      x: b.x, y: b.y, vx: 0, vy: 0,
+      size: 2.5 + Math.max(0, (3 - b.mag)) * 0.7,
+      mag: b.mag, spectral: b.cls,
+      isNamed: true, dist: b.dist,
+      desc: b.desc,
+    });
+  }
+
+  /* -------- Comets with curved Keplerian-like paths -------- */
+  for (let i = 0; i < 6; i++) {
+    const x = rr(100, W - 100);
+    const y = rr(100, H - 100);
+    const ang = rand() * Math.PI * 2;
+    const spd = rr(120, 200);
+    const curve = rr(-60, 60);
+    objects.push({
+      id: 'C/2025 ' + String.fromCharCode(65 + i) + (i + 1),
+      name: null, type: 'comet',
+      x, y,
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      perpX: Math.cos(ang + Math.PI/2) * curve * 2,
+      perpY: Math.sin(ang + Math.PI/2) * curve * 2,
+      size: rr(3.5, 6), mag: rr(9, 14),
+      dist: '—',
+      desc: '<strong>Simulated comet.</strong> Comets develop tails when solar radiation and solar wind push gas and dust away from the Sun.'
+    });
+  }
+
+  /* -------- Asteroid belt (denser along ecliptic) -------- */
+  for (let i = 0; i < 40; i++) {
+    const l1 = 'ABCDEFGHJKLMNOP'[Math.floor(rand() * 16)];
+    const l2 = 'ABCDEFGHJKLMNOP'[Math.floor(rand() * 16)];
+    const x = rr(80, W - 80);
+    // Bias toward horizontal band (ecliptic plane)
+    const yBias = rr(-1, 1);
+    const y = H / 2 + yBias * H * 0.35 + rr(-30, 30);
+    objects.push({
+      id: `2025 ${l1}${l2}${i + 1}`,
+      name: null, type: 'asteroid',
+      x, y: Math.max(60, Math.min(H - 60, y)),
+      vx: (rand() - 0.5) * 110, vy: (rand() - 0.5) * 110,
+      size: rr(2, 3.5), mag: rr(12, 16),
+      dist: '~2 AU',
+      desc: '<strong>Simulated asteroid.</strong> Main-belt asteroids drift by a few arcminutes over six months. SPHEREx detects them by comparing positions between epochs.'
+    });
+  }
+
+  /* -------- NEOs -------- */
+  for (let i = 0; i < 4; i++) {
+    const ang = rand() * Math.PI * 2;
+    const spd = rr(180, 260);
+    objects.push({
+      id: `2025 NEO-${i + 1}`,
+      name: null, type: 'fast',
+      x: rr(120, W - 120), y: rr(120, H - 120),
+      vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd,
+      size: rr(3.5, 5.5), mag: rr(13, 16),
+      dist: '—',
+      desc: '<strong>Simulated near-Earth object.</strong> NEOs move fast because they pass close to Earth. Real surveys like SPHEREx help catalog them for planetary defense.'
+    });
+  }
+
+  /* -------- Position -------- */
+  function posAt(o, t) {
+    let x = o.x + o.vx * t;
+    let y = o.y + o.vy * t;
+    if (o.perpX !== undefined) {
+      const k = Math.sin(t * Math.PI);
+      x += o.perpX * k;
+      y += o.perpY * k;
+    }
+    return { x, y };
+  }
+
+  /* -------- Canvas -------- */
+  const cvA = document.getElementById('cvA');
+  const cvB = document.getElementById('cvB');
+  const ctxA = cvA.getContext('2d');
+  const ctxB = cvB.getContext('2d');
+
+  /* -------- Sprite cache -------- */
+  const spriteCache = new Map();
+  function getStarSprite(radius, colorStr) {
+    const key = radius.toFixed(2) + '|' + colorStr;
+    if (spriteCache.has(key)) return spriteCache.get(key);
+    const size = Math.max(8, Math.ceil(radius * 10));
+    const c = document.createElement('canvas');
+    c.width = c.height = size;
+    const g = c.getContext('2d');
+    const cx = size / 2;
+    const m = colorStr.match(/(\d+),\s*(\d+),\s*(\d+)/);
+    const [r, gg, b] = [m[1], m[2], m[3]];
+    const grad = g.createRadialGradient(cx, cx, 0, cx, cx, cx);
+    grad.addColorStop(0, `rgba(${r},${gg},${b},1)`);
+    grad.addColorStop(0.28, `rgba(${r},${gg},${b},0.75)`);
+    grad.addColorStop(0.6, `rgba(${r},${gg},${b},0.18)`);
+    grad.addColorStop(1, `rgba(${r},${gg},${b},0)`);
+    g.fillStyle = grad;
+    g.beginPath(); g.arc(cx, cx, cx, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#fff';
+    g.beginPath(); g.arc(cx, cx, radius * 0.5, 0, Math.PI * 2); g.fill();
+    const sprite = { canvas: c, size };
+    spriteCache.set(key, sprite);
+    return sprite;
+  }
+  function hexToRgbStr(hex) {
+    const n = parseInt(hex.slice(1), 16);
+    return `rgb(${(n>>16)&255},${(n>>8)&255},${n&255})`;
+  }
+
+  /* -------- Background -------- */
+  function drawBackground(ctx) {
+    const g = ctx.createRadialGradient(W/2, H/2, 40, W/2, H/2, W*0.75);
+    const base1 = currentBand < 3 ? '#080d1e' : currentBand < 7 ? '#0a0d24' : '#140a20';
+    const base2 = currentBand < 3 ? '#01020a' : currentBand < 7 ? '#01020f' : '#0a0410';
+    g.addColorStop(0, base1);
+    g.addColorStop(1, base2);
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, W, H);
+
+    const nebulaIntensity = currentBand >= 6 ? 1.0 : (currentBand >= 3 ? 0.5 : 0.15);
+    ctx.globalCompositeOperation = 'lighter';
+    for (const n of nebulae) {
+      // Parallax: nebula moves slowly with camera (for future pan support)
+      const ng = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, n.size);
+      ng.addColorStop(0, `hsla(${n.hue}, 70%, 60%, ${n.intensity * nebulaIntensity})`);
+      ng.addColorStop(0.5, `hsla(${n.hue}, 70%, 50%, ${n.intensity * nebulaIntensity * 0.4})`);
+      ng.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = ng;
+      ctx.beginPath(); ctx.arc(n.x, n.y, n.size, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.strokeStyle = 'rgba(60,90,150,0.07)';
+    ctx.lineWidth = 1;
+    for (let i = 1; i < 10; i++) {
+      const p = (i / 10) * W;
+      ctx.beginPath(); ctx.moveTo(p, 0); ctx.lineTo(p, H); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, p); ctx.lineTo(W, p); ctx.stroke();
+    }
+  }
+
+  /* -------- Draw primitives -------- */
+  function drawStar(ctx, x, y, size, spectral) {
+    const data = SPECTRAL[spectral] || { color: '#ffffff' };
+    const rgb = hexToRgbStr(data.color);
+    const r = Math.max(0.6, size);
+    const sprite = getStarSprite(r, rgb);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.drawImage(sprite.canvas, x - sprite.size/2, y - sprite.size/2);
+    ctx.globalCompositeOperation = 'source-over';
+    if (r > 1.6) {
+      const L = r * 6;
+      ctx.strokeStyle = 'rgba(190,215,255,0.35)';
+      ctx.lineWidth = 0.55;
+      ctx.beginPath();
+      ctx.moveTo(x - L, y); ctx.lineTo(x + L, y);
+      ctx.moveTo(x, y - L); ctx.lineTo(x, y + L);
+      ctx.stroke();
+    }
+  }
+
+  function drawComet(ctx, x, y, size, vx, vy) {
+    const mag = Math.hypot(vx, vy) || 1;
+    const tailLen = 30 + size * 4;
+    const tx = x - (vx / mag) * tailLen;
+    const ty = y - (vy / mag) * tailLen;
+    const g = ctx.createLinearGradient(x, y, tx, ty);
+    g.addColorStop(0, 'rgba(140,200,255,0.95)');
+    g.addColorStop(0.6, 'rgba(140,200,255,0.3)');
+    g.addColorStop(1, 'rgba(140,200,255,0)');
+    ctx.strokeStyle = g;
+    ctx.lineWidth = Math.max(2, size * 1.5);
+    ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(tx, ty); ctx.stroke();
+
+    ctx.globalCompositeOperation = 'lighter';
+    const sprite = getStarSprite(size * 1.3, 'rgb(160,210,255)');
+    ctx.drawImage(sprite.canvas, x - sprite.size/2, y - sprite.size/2);
+    ctx.globalCompositeOperation = 'source-over';
+
+    ctx.beginPath();
+    ctx.fillStyle = '#dff0ff';
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function drawAsteroid(ctx, x, y, size) {
+    ctx.beginPath();
+    ctx.fillStyle = 'rgba(255,190,120,0.95)';
+    const sides = 7;
+    for (let i = 0; i < sides; i++) {
+      const a = (i / sides) * Math.PI * 2;
+      const r = size * (0.75 + ((i * 53) % 11) / 22);
+      const px = x + Math.cos(a) * r;
+      const py = y + Math.sin(a) * r;
+      if (i === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+    const sprite = getStarSprite(size, 'rgb(255,190,120)');
+    ctx.drawImage(sprite.canvas, x - sprite.size/2, y - sprite.size/2);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawFast(ctx, x, y, size) {
+    ctx.beginPath();
+    ctx.fillStyle = '#ff8a72';
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = 'lighter';
+    const sprite = getStarSprite(size * 1.3, 'rgb(255,120,100)');
+    ctx.drawImage(sprite.canvas, x - sprite.size/2, y - sprite.size/2);
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  function drawNebulaMarker(ctx, x, y, size) {
+    if (currentBand < 4) return;
+    ctx.strokeStyle = 'rgba(255,212,122,0.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath(); ctx.arc(x, y, size * 1.6, 0, Math.PI * 2); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+
+  function drawLabel(ctx, x, y, text, color, size) {
+    const fontSize = size || 12;
+    ctx.font = `600 ${fontSize}px ui-monospace, monospace`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.strokeStyle = 'rgba(0,0,0,0.85)';
+    ctx.lineWidth = 3;
+    ctx.lineJoin = 'round';
+    ctx.strokeText(text, x, y);
+    ctx.fillStyle = color;
+    ctx.fillText(text, x, y);
+  }
+
+  function drawLabels(ctx, t) {
+    for (const o of objects) {
+      if (!o.name && !o.isDSO) continue;
+      const p = posAt(o, t);
+      if (p.x < 0 || p.x > W || p.y < 0 || p.y > H) continue;
+
+      if (o.type === 'nebula') {
+        if (currentBand < 3) continue;
+        drawLabel(ctx, p.x + o.size * 1.6 + 4, p.y, o.name, 'rgba(255,212,122,0.95)', 10);
+      } else if (o.isNamed) {
+        const spec = SPECTRAL[o.spectral];
+        const color = spec ? spec.color : '#ffffff';
+        drawLabel(ctx, p.x + o.size + 8, p.y - 2, o.name, color, 12);
+      }
+    }
+  }
+
+  /* -------- Constellation polygon -------- */
+  const CONSTELLATION_OUTLINE = ['Betelgeuse', 'Bellatrix', 'Mintaka', 'Rigel', 'Saiph', 'Alnitak', 'Betelgeuse'];
+  const CONSTELLATION_BELT = ['Alnitak', 'Alnilam', 'Mintaka'];
+
+  function drawConstellations(ctx, t) {
+    // Filled polygon
+    const pts = CONSTELLATION_OUTLINE.map(n => {
+      const o = objects.find(ob => ob.name === n);
+      return o ? posAt(o, t) : null;
+    }).filter(Boolean);
+    if (pts.length > 2) {
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
+      ctx.closePath();
+      ctx.fillStyle = 'rgba(91,157,255,0.04)';
+      ctx.fill();
+    }
+    // Outline
+    ctx.strokeStyle = 'rgba(91,157,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 4]);
+    ctx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      if (i === 0) ctx.moveTo(pts[i].x, pts[i].y);
+      else ctx.lineTo(pts[i].x, pts[i].y);
+    }
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Belt connections
+    ctx.strokeStyle = 'rgba(255,212,122,0.45)';
+    ctx.lineWidth = 1.4;
+    ctx.setLineDash([2, 3]);
+    for (let i = 0; i < CONSTELLATION_BELT.length - 1; i++) {
+      const a = objects.find(ob => ob.name === CONSTELLATION_BELT[i]);
+      const b = objects.find(ob => ob.name === CONSTELLATION_BELT[i+1]);
+      if (!a || !b) continue;
+      const pa = posAt(a, t), pb = posAt(b, t);
+      ctx.beginPath();
+      ctx.moveTo(pa.x, pa.y);
+      ctx.lineTo(pb.x, pb.y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // Head connection
+    const bet = objects.find(o => o.name === 'Betelgeuse');
+    const mei = objects.find(o => o.name === 'Meissa');
+    const bell = objects.find(o => o.name === 'Bellatrix');
+    if (bet && mei && bell) {
+      const pb = posAt(bet, t), pm = posAt(mei, t), pbe = posAt(bell, t);
+      ctx.strokeStyle = 'rgba(91,157,255,0.22)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 4]);
+      ctx.beginPath();
+      ctx.moveTo(pb.x, pb.y); ctx.lineTo(pm.x, pm.y); ctx.lineTo(pbe.x, pbe.y);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  /* -------- State -------- */
+  const state = {
+    t: 0, playing: false, blinking: false, blinkPhase: 0,
+    showTrails: true, showGhosts: true, showVectors: true, showLabels: true,
+    showConstellations: true, showNebula: true,
+    speed: 1.0, presenting: false,
+    direction: 1, lastTime: 0, rafId: null, blinkTimer: null,
+    selectedId: null,
+  };
+
+  /* -------- Render -------- */
+  function renderLeft() {
+    ctxA.clearRect(0, 0, W, H);
+    drawBackground(ctxA);
+    if (state.showConstellations) drawConstellations(ctxA, 0);
+    for (const o of objects) {
+      const p = posAt(o, 0);
+      drawOneObject(ctxA, o, p.x, p.y, false, false);
+    }
+    if (state.showLabels) drawLabels(ctxA, 0);
+  }
+
+  function renderRight() {
+    const displayT = state.blinking ? state.blinkPhase : state.t;
+    document.getElementById('tTag').textContent = 't = ' + displayT.toFixed(2);
+
+    ctxB.clearRect(0, 0, W, H);
+    drawBackground(ctxB);
+
+    if (state.showTrails) {
+      for (const o of objects) {
+        if (o.type === 'star' || o.type === 'nebula') continue;
+        const p0 = posAt(o, 0);
+        const p1 = posAt(o, 1);
+        if (Math.hypot(p1.x - p0.x, p1.y - p0.y) < 3) continue;
+        const samples = o.perpX !== undefined ? 22 : 2;
+        ctxB.beginPath();
+        ctxB.strokeStyle = 'rgba(255,94,138,0.3)';
+        ctxB.lineWidth = 1.5;
+        ctxB.setLineDash([4, 4]);
+        for (let s = 0; s <= samples; s++) {
+          const tt = s / samples;
+          const p = posAt(o, tt);
+          if (s === 0) ctxB.moveTo(p.x, p.y); else ctxB.lineTo(p.x, p.y);
+        }
+        ctxB.stroke();
+        ctxB.setLineDash([]);
+      }
+    }
+
+    if (state.showGhosts) {
+      for (const o of objects) {
+        if (o.type === 'star' || o.type === 'nebula') continue;
+        const p0 = posAt(o, 0);
+        const p1 = posAt(o, 1);
+        if (Math.hypot(p1.x - p0.x, p1.y - p0.y) < 3) continue;
+        ctxB.beginPath();
+        ctxB.strokeStyle = 'rgba(127,179,255,0.5)';
+        ctxB.lineWidth = 1.2;
+        ctxB.arc(p0.x, p0.y, o.size + 3, 0, Math.PI * 2);
+        ctxB.stroke();
+      }
+    }
+
+    if (state.showVectors) {
+      for (const o of objects) {
+        if (o.type === 'star' || o.type === 'nebula') continue;
+        const spd = Math.hypot(o.vx, o.vy);
+        if (spd < 60) continue;
+        const p = posAt(o, displayT);
+        const L = 16 + spd * 0.05;
+        const ux = o.vx / spd, uy = o.vy / spd;
+        const ex = p.x + ux * L;
+        const ey = p.y + uy * L;
+        ctxB.beginPath();
+        ctxB.strokeStyle = 'rgba(255,94,138,0.7)';
+        ctxB.lineWidth = 1.4;
+        ctxB.moveTo(p.x, p.y); ctxB.lineTo(ex, ey); ctxB.stroke();
+        const px = -uy, py = ux;
+        ctxB.beginPath();
+        ctxB.fillStyle = 'rgba(255,94,138,0.85)';
+        ctxB.moveTo(ex, ey);
+        ctxB.lineTo(ex - ux*6 + px*4, ey - uy*6 + py*4);
+        ctxB.lineTo(ex - ux*6 - px*4, ey - uy*6 - py*4);
+        ctxB.closePath();
+        ctxB.fill();
+      }
+    }
+
+    if (state.showConstellations) drawConstellations(ctxB, displayT);
+
+    for (const o of objects) {
+      const p = posAt(o, displayT);
+      const highlighted = o.type !== 'star' && o.type !== 'nebula';
+      const selected = state.selectedId === o.id;
+      drawOneObject(ctxB, o, p.x, p.y, highlighted, selected);
+    }
+
+    if (state.showLabels) drawLabels(ctxB, displayT);
+  }
+
+  function drawOneObject(ctx, o, x, y, highlighted, selected) {
+    const band = BANDS[currentBand];
+    const isFeatured = !band.filter || band.filter(o);
+    const alpha = isFeatured ? 1.0 : 0.22;
+
+    ctx.globalAlpha = alpha;
+
+    if (o.type === 'star') drawStar(ctx, x, y, o.size, o.spectral);
+    else if (o.type === 'comet') drawComet(ctx, x, y, o.size, o.vx, o.vy);
+    else if (o.type === 'asteroid') drawAsteroid(ctx, x, y, o.size);
+    else if (o.type === 'fast') drawFast(ctx, x, y, o.size);
+    else if (o.type === 'nebula') drawNebulaMarker(ctx, x, y, o.size);
+
+    ctx.globalAlpha = 1;
+
+    if (selected) {
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 1.7;
+      ctx.beginPath(); ctx.arc(x, y, o.size + 14, 0, Math.PI * 2); ctx.stroke();
+    }
+    if (highlighted && o.type !== 'nebula') {
+      ctx.strokeStyle = 'rgba(255,94,138,0.85)';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(x, y, o.size + 6, 0, Math.PI * 2); ctx.stroke();
+    }
+  }
+
+  /* -------- UI -------- */
+  const slider = document.getElementById('slider');
+  const readout = document.getElementById('readout');
+  const playBtn = document.getElementById('playBtn');
+  const blinkBtn = document.getElementById('blinkBtn');
+  const labelBtn = document.getElementById('labelBtn');
+  const trailBtn = document.getElementById('trailBtn');
+  const ghostBtn = document.getElementById('ghostBtn');
+  const vectorBtn = document.getElementById('vectorBtn');
+  const constBtn = document.getElementById('constBtn');
+  const nebulaBtn = document.getElementById('nebulaBtn');
+  const blinkIndicator = document.getElementById('blinkIndicator');
+  const starList = document.getElementById('starList');
+  const infoPanel = document.getElementById('infoPanel');
+  const insSubtitle = document.getElementById('insSubtitle');
+  const bandSelector = document.getElementById('bandSelector');
+  const bandBadgeA = document.getElementById('bandBadgeA');
+  const bandBadgeB = document.getElementById('bandBadgeB');
+  const speedBadgeA = document.getElementById('speedBadgeA');
+  const speedBadgeB = document.getElementById('speedBadgeB');
+  const speedRange = document.getElementById('speedRange');
+  const speedValue = document.getElementById('speedValue');
+  const presentBtn = document.getElementById('presentBtn');
+  const snapBtn = document.getElementById('snapBtn');
+  const presentationExit = document.getElementById('presentationExit');
+
+  const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  function updateReadout() {
+    const start = Date.UTC(2025, 0, 1);
+    const end = Date.UTC(2025, 6, 2);
+    const d = new Date(start + (end - start) * state.t);
+    readout.textContent = MONTHS[d.getUTCMonth()] + ' ' + d.getUTCFullYear();
+  }
+
+  /* -------- Speed -------- */
+  function setSpeed(value) {
+    state.speed = Math.max(0.1, Math.min(8.0, value));
+    const display = state.speed.toFixed(2) + '×';
+    speedValue.textContent = display;
+    speedBadgeA.textContent = display;
+    speedBadgeB.textContent = display;
+    speedRange.value = Math.round(state.speed * 100);
+    document.querySelectorAll('.speed-preset').forEach(p => {
+      const pv = parseFloat(p.dataset.speed);
+      p.classList.toggle('on', Math.abs(pv - state.speed) < 0.001);
+    });
+  }
+  document.querySelectorAll('.speed-preset').forEach(p => {
+    p.addEventListener('click', () => setSpeed(parseFloat(p.dataset.speed)));
+  });
+  speedRange.addEventListener('input', (e) => setSpeed(parseFloat(e.target.value) / 100));
+
+  /* -------- Band selector -------- */
+  function buildBandSelector() {
+    bandSelector.innerHTML = '';
+    BANDS.forEach((b, i) => {
+      const chip = document.createElement('div');
+      chip.className = 'band-chip' + (i === currentBand ? ' on' : '');
+      chip.style.color = i === currentBand ? b.color : '';
+      chip.innerHTML = `${b.name}<span class="wl">${b.wl.toFixed(2)} µm</span>`;
+      chip.title = b.desc;
+      chip.addEventListener('click', () => {
+        currentBand = i;
+        updateBandUI();
+        renderLeft();
+        renderRight();
+      });
+      bandSelector.appendChild(chip);
+    });
+  }
+
+  function updateBandUI() {
+    const b = BANDS[currentBand];
+    bandBadgeA.textContent = `${b.name} · ${b.wl.toFixed(2)} µm`;
+    bandBadgeB.textContent = `${b.name} · ${b.wl.toFixed(2)} µm`;
+    bandBadgeA.style.color = b.color;
+    bandBadgeB.style.color = b.color;
+    document.querySelectorAll('.band-chip').forEach((c, i) => {
+      c.classList.toggle('on', i === currentBand);
+      c.style.color = i === currentBand ? BANDS[i].color : '';
+    });
+  }
+
+  slider.addEventListener('input', () => {
+    if (state.playing) stopPlay();
+    if (state.blinking) stopBlink();
+    state.t = slider.value / 100;
+    updateReadout();
+    renderRight();
+  });
+
+  /* -------- Play -------- */
+  function startPlay() {
+    if (state.blinking) stopBlink();
+    state.playing = true;
+    playBtn.classList.add('on');
+    playBtn.textContent = '❚❚ Pause';
+    state.lastTime = performance.now();
+    state.rafId = requestAnimationFrame(playLoop);
+  }
+  function stopPlay() {
+    state.playing = false;
+    playBtn.classList.remove('on');
+    playBtn.textContent = '▶ Play';
+    if (state.rafId) cancelAnimationFrame(state.rafId);
+    state.rafId = null;
+  }
+  function playLoop(now) {
+    if (!state.playing) return;
+    const dt = Math.min(64, now - state.lastTime);
+    state.lastTime = now;
+    const baseRate = 0.00028;
+    const phase = state.direction > 0 ? state.t : 1 - state.t;
+    const ease = 0.5 + Math.abs(Math.cos(phase * Math.PI)) * 1.2;
+    state.t += state.direction * baseRate * ease * state.speed * dt;
+    if (state.t >= 1) { state.t = 1; state.direction = -1; }
+    if (state.t <= 0) { state.t = 0; state.direction = 1; }
+    slider.value = state.t * 100;
+    updateReadout();
+    renderRight();
+    state.rafId = requestAnimationFrame(playLoop);
+  }
+  playBtn.addEventListener('click', () => {
+    if (state.playing) stopPlay(); else startPlay();
+  });
+
+  /* -------- Blink -------- */
+  function startBlink() {
+    if (state.playing) stopPlay();
+    state.blinking = true;
+    blinkBtn.classList.add('on');
+    blinkBtn.textContent = '⚡ Stop';
+    blinkIndicator.classList.add('on');
+    state.blinkPhase = 1;
+    blinkIndicator.textContent = 'EPOCH 2 · JUL 2025';
+    renderRight();
+    const interval = Math.max(150, Math.round(600 / state.speed));
+    state.blinkTimer = setInterval(() => {
+      state.blinkPhase = 1 - state.blinkPhase;
+      blinkIndicator.textContent = state.blinkPhase === 0 ? 'EPOCH 1 · JAN 2025' : 'EPOCH 2 · JUL 2025';
+      renderRight();
+    }, interval);
+  }
+  function stopBlink() {
+    state.blinking = false;
+    blinkBtn.classList.remove('on');
+    blinkBtn.textContent = '⚡ Blink';
+    blinkIndicator.classList.remove('on');
+    if (state.blinkTimer) clearInterval(state.blinkTimer);
+    state.blinkTimer = null;
+    renderRight();
+  }
+  blinkBtn.addEventListener('click', () => {
+    if (state.blinking) stopBlink(); else startBlink();
+  });
+
+  /* -------- Overlays -------- */
+  labelBtn.addEventListener('click', () => {
+    state.showLabels = !state.showLabels;
+    labelBtn.classList.toggle('on', state.showLabels);
+    renderLeft(); renderRight();
+  });
+  trailBtn.addEventListener('click', () => {
+    state.showTrails = !state.showTrails;
+    trailBtn.classList.toggle('on', state.showTrails);
+    renderRight();
+  });
+  ghostBtn.addEventListener('click', () => {
+    state.showGhosts = !state.showGhosts;
+    ghostBtn.classList.toggle('on', state.showGhosts);
+    renderRight();
+  });
+  vectorBtn.addEventListener('click', () => {
+    state.showVectors = !state.showVectors;
+    vectorBtn.classList.toggle('on', state.showVectors);
+    renderRight();
+  });
+  constBtn.addEventListener('click', () => {
+    state.showConstellations = !state.showConstellations;
+    constBtn.classList.toggle('on', state.showConstellations);
+    renderLeft(); renderRight();
+  });
+  nebulaBtn.addEventListener('click', () => {
+    state.showNebula = !state.showNebula;
+    nebulaBtn.classList.toggle('on', state.showNebula);
+    renderLeft(); renderRight();
+  });
+
+  /* -------- Catalog -------- */
+  function buildCatalog() {
+    starList.innerHTML = '';
+    const named = objects.filter(o => o.isNamed || o.isDSO);
+    named.sort((a, b) => a.mag - b.mag);
+
+    for (const o of named) {
+      const row = document.createElement('div');
+      row.className = 'star-row' + (state.selectedId === o.id ? ' selected' : '');
+      const color = o.type === 'nebula' ? '#ffd47a'
+                  : (SPECTRAL[o.spectral] ? SPECTRAL[o.spectral].color : '#fff');
+      const cls = o.type === 'nebula' ? 'DSO' : (o.spectral || '—');
+      const bayerStr = o.bayer ? `<span class="bayer">${o.bayer}</span>` : '';
+      row.innerHTML = `
+        <span class="dot" style="background:${color};color:${color}"></span>
+        <span class="nm">${o.name}</span>
+        ${bayerStr}
+        <span class="cls">${cls}</span>
+        <span class="mag">mag ${o.mag.toFixed(2)}</span>
+        <span class="dist">${o.dist || ''}</span>
+      `;
+      row.addEventListener('click', () => selectObject(o));
+      starList.appendChild(row);
+    }
+  }
+
+  function selectObject(o) {
+    state.selectedId = o ? o.id : null;
+    if (!o) {
+      infoPanel.innerHTML = `<div class="info-hint">🔍 Click any object or catalog entry to inspect it</div>`;
+      insSubtitle.textContent = '—';
+      buildCatalog(); renderLeft(); renderRight();
+      return;
+    }
+
+    const typeInfo = {
+      star: { label: 'Star', color: '#ffffff' },
+      comet: { label: 'Comet', color: '#7fb3ff' },
+      asteroid: { label: 'Asteroid', color: '#ffb347' },
+      fast: { label: 'NEO', color: '#ff7864' },
+      nebula: { label: 'Deep-sky object', color: '#ffd47a' },
+    };
+    const info = typeInfo[o.type] || { label: o.type, color: '#fff' };
+
+    const p0 = posAt(o, 0);
+    const p1 = posAt(o, 1);
+    const disp = Math.hypot(p1.x - p0.x, p1.y - p0.y);
+    const arcminPerPx = (30 * 60) / W;
+    const dispArcmin = disp * arcminPerPx;
+
+    let spectralInfo = '';
+    if (o.type === 'star' && o.spectral) {
+      const sp = SPECTRAL[o.spectral];
+      spectralInfo = `<span>spectral <strong>${o.spectral}</strong> · ${sp.temp}</span>`;
+    }
+    let motionInfo = '';
+    if (o.type !== 'star' && o.type !== 'nebula') {
+      const velocity = Math.hypot(o.vx, o.vy) * arcminPerPx;
+      motionInfo = `<span>Δ <strong>${dispArcmin.toFixed(1)}′</strong></span><span>v <strong>${(velocity / 6).toFixed(2)}′/mo</strong></span>`;
+    }
+
+    let spectrumHTML = '<div class="spectrum-bar">';
+    BANDS.forEach((b, i) => {
+      const active = !b.filter || b.filter(o);
+      spectrumHTML += `<div class="band${active ? ' on' : ''}" style="background:${b.color};opacity:${active ? 1 : 0.3}" title="${b.name} · ${b.wl} µm: ${b.desc}">${b.name}</div>`;
+    });
+    spectrumHTML += '</div>';
+
+    infoPanel.innerHTML = `
+      <div class="info-header">
+        <span class="info-id">${o.id}</span>
+        <span class="info-name">${o.name || info.label}</span>
+        ${o.bayer ? `<span class="info-bayer">${o.bayer}</span>` : ''}
+      </div>
+      <div class="info-fields">
+        <span>mag <strong>${o.mag.toFixed(2)}</strong></span>
+        ${o.dist ? `<span>dist <strong>${o.dist}</strong></span>` : ''}
+        ${spectralInfo}
+        ${motionInfo}
+      </div>
+      <div class="info-desc">${o.desc || `<strong>${info.label}.</strong> A simulated source in this SPHEREx field.`}</div>
+      <div style="margin-top:4px">
+        <div style="font-size:0.65rem;color:var(--dim);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Band visibility</div>
+        ${spectrumHTML}
+      </div>
+    `;
+    insSubtitle.textContent = o.name ? o.name : o.id;
+    buildCatalog(); renderLeft(); renderRight();
+  }
+
+  cvB.addEventListener('click', (e) => {
+    const rect = cvB.getBoundingClientRect();
+    const mx = (e.clientX - rect.left) * (W / rect.width);
+    const my = (e.clientY - rect.top) * (H / rect.height);
+    const displayT = state.blinking ? state.blinkPhase : state.t;
+    let best = null, bestDist = 20;
+    for (const o of objects) {
+      const p = posAt(o, displayT);
+      const d = Math.hypot(p.x - mx, p.y - my);
+      const hitR = Math.max(14, o.size + 6);
+      if (d < bestDist && d < hitR) { bestDist = d; best = o; }
+    }
+    if (best) selectObject(best);
+  });
+
+  /* -------- Stats -------- */
+  function computeStats() {
+    let total = objects.length;
+    let moving = 0;
+    for (const o of objects) {
+      if (o.type === 'star' || o.type === 'nebula') continue;
+      const p0 = posAt(o, 0);
+      const p1 = posAt(o, 1);
+      if (Math.hypot(p1.x - p0.x, p1.y - p0.y) > 3) moving++;
+    }
+    document.getElementById('statTotal').textContent = total;
+    document.getElementById('statMoving').textContent = moving;
+    document.getElementById('statNamed').textContent = objects.filter(o => o.isNamed).length;
+    document.getElementById('statDSO').textContent = objects.filter(o => o.isDSO).length;
+  }
+
+  /* -------- Presentation mode -------- */
+  let presentationTimer = null;
+  const PRESENT_SEQUENCE = [
+    { band: 0, t: 0, speed: 1.0, features: { labels: true, trails: false, ghosts: false, vectors: false, constellations: true, nebula: true }, wait: 4000 },
+    { band: 2, t: 0.3, speed: 1.0, features: { labels: true, trails: true, ghosts: true, vectors: true, constellations: true, nebula: true }, wait: 5000 },
+    { band: 5, t: 0.7, speed: 1.0, features: { labels: true, trails: true, ghosts: true, vectors: true, constellations: false, nebula: true }, wait: 4000 },
+    { band: 9, t: 1.0, speed: 1.0, features: { labels: true, trails: true, ghosts: true, vectors: true, constellations: false, nebula: true }, wait: 4000 },
+  ];
+  let presentStep = 0;
+
+  function startPresentation() {
+    state.presenting = true;
+    document.body.classList.add('presenting');
+    presentStep = 0;
+    runPresentStep();
+  }
+
+  function runPresentStep() {
+    if (!state.presenting) return;
+    if (presentStep >= PRESENT_SEQUENCE.length) {
+      endPresentation();
+      return;
+    }
+    const step = PRESENT_SEQUENCE[presentStep];
+    currentBand = step.band;
+    state.t = step.t;
+    slider.value = state.t * 100;
+    updateBandUI();
+    updateReadout();
+    // Feature flags
+    state.showLabels = step.features.labels;
+    state.showTrails = step.features.trails;
+    state.showGhosts = step.features.ghosts;
+    state.showVectors = step.features.vectors;
+    state.showConstellations = step.features.constellations;
+    state.showNebula = step.features.nebula;
+    labelBtn.classList.toggle('on', state.showLabels);
+    trailBtn.classList.toggle('on', state.showTrails);
+    ghostBtn.classList.toggle('on', state.showGhosts);
+    vectorBtn.classList.toggle('on', state.showVectors);
+    constBtn.classList.toggle('on', state.showConstellations);
+    nebulaBtn.classList.toggle('on', state.showNebula);
+    setSpeed(step.speed);
+    renderLeft(); renderRight();
+    // Auto-play the timeline between steps
+    if (!state.playing) startPlay();
+    presentStep++;
+    presentationTimer = setTimeout(runPresentStep, step.wait);
+  }
+
+  function endPresentation() {
+    state.presenting = false;
+    document.body.classList.remove('presenting');
+    if (presentationTimer) clearTimeout(presentationTimer);
+    presentationTimer = null;
+  }
+
+  presentBtn.addEventListener('click', () => {
+    if (state.presenting) endPresentation();
+    else startPresentation();
+  });
+  presentationExit.addEventListener('click', endPresentation);
+
+  /* -------- Snapshot -------- */
+  snapBtn.addEventListener('click', () => {
+    const link = document.createElement('a');
+    link.download = 'spherex-snapshot-' + Date.now() + '.png';
+    link.href = cvB.toDataURL('image/png');
+    link.click();
+  });
+
+  /* -------- Keyboard -------- */
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    const k = e.key.toLowerCase();
+    if (k === ' ') { e.preventDefault(); playBtn.click(); }
+    else if (k === 'b') blinkBtn.click();
+    else if (k === 't') trailBtn.click();
+    else if (k === 'g') ghostBtn.click();
+    else if (k === 'v') vectorBtn.click();
+    else if (k === 'l') labelBtn.click();
+    else if (k === 'c') constBtn.click();
+    else if (k === 'p') presentBtn.click();
+    else if (k === 's') snapBtn.click();
+    else if (k === 'escape') {
+      selectObject(null);
+      if (state.presenting) endPresentation();
+    }
+    else if (k === '[') setSpeed(Math.max(0.1, state.speed - 0.1));
+    else if (k === ']') setSpeed(Math.min(8.0, state.speed + 0.1));
+    else if (k === 'r') setSpeed(1.0);
+    else if (k >= '1' && k <= '9') {
+      const i = parseInt(k) - 1;
+      if (i < BANDS.length) { currentBand = i; updateBandUI(); renderLeft(); renderRight(); }
+    }
+    else if (k === '0') { currentBand = 9; updateBandUI(); renderLeft(); renderRight(); }
+    else if (k === 'arrowleft') {
+      slider.value = Math.max(0, parseFloat(slider.value) - 2);
+      slider.dispatchEvent(new Event('input'));
+      e.preventDefault();
+    }
+    else if (k === 'arrowright') {
+      slider.value = Math.min(100, parseFloat(slider.value) + 2);
+      slider.dispatchEvent(new Event('input'));
+      e.preventDefault();
+    }
+  });
+
+  /* -------- Intro fade -------- */
+  setTimeout(() => {
+    const intro = document.getElementById('intro');
+    if (intro) intro.classList.add('fade');
+    setTimeout(() => { if (intro) intro.remove(); }, 1100);
+  }, 2600);
+
+  /* -------- Init -------- */
+  buildBandSelector();
+  updateBandUI();
+  setSpeed(1.0);
+  updateReadout();
+  computeStats();
+  buildCatalog();
+  renderLeft();
+  renderRight();
+
+  setTimeout(() => { if (!state.playing) startPlay(); }, 3400);
+
+})();
+</script>
+</body>
+</html>
